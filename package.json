@@ -1,0 +1,42 @@
+{
+  "name": "styles",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "scripts": {
+    "css": "npm-run-all css-compile* --sequential css-prefix* css-minify* fontello-dist*",
+    "css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 scss/karma.scss src/static/css/karma.css",
+    "css-prefix": "postcss --config scss/postcss.config.js --replace \"src/static/css/*.css\" \"!src/static/css/*.min.css\"",
+    "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output src/static/css/karma.min.css src/static/css/karma.css",
+    "fontello-dist": "cpy 'scss/fontello/font/*' src/static/font",
+    "fontello-install": "fontello-cli install --config scss/fontello/config.json --css scss/fontello/css --font scss/fontello/font",
+    "fontello-web": "fontello-cli open --config scss/fontello/config.json",
+    "watch-css": "nodemon -e scss -x \"npm run css\"",
+    "js-minify": "rm src/static/js/*.min.js; for f in src/static/js/*.js; do short=${f%.js}; uglifyjs $f > $short.min.js; done"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.4",
+    "clean-css-cli": "^4.3.0",
+    "cpy-cli": "^3.1.1",
+    "fontello-cli": "^0.6.2",
+    "karma-css": "^2.0.0",
+    "node-sass": "^5.0.0",
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5",
+    "postcss-cli": "^8.3.1",
+    "uglify-js": "^3.12.6"
+  },
+  "browserslist": [
+    "last 1 major version",
+    ">= 1%",
+    "Chrome >= 45",
+    "Firefox >= 38",
+    "Edge >= 12",
+    "Explorer >= 10",
+    "iOS >= 9",
+    "Safari >= 9",
+    "Android >= 4.4",
+    "Opera >= 30"
+  ]
+}

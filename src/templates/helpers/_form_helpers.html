@@ -1,0 +1,12 @@
+{% macro render_field(field) %}
+<div class="{% if field.errors %}text-error{% endif %}">
+    <label for="{{ field.id }}">{{ field.label.text|replace("_", " ")|title }}</label>
+    {{ field }}
+    {% if field.errors %}
+    <cite>{{ field.errors|join(' ') }}</cite>
+    {% elif field.description %}
+    <cite>{{ field.description }}</cite>
+    {% endif %}
+
+</div>
+{% endmacro %}

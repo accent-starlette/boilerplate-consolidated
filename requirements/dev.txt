@@ -1,0 +1,13 @@
+-r base.txt
+
+asgi-lifespan
+autoflake
+black
+httpx
+isort
+mock
+mypy
+pytest
+pytest-asyncio
+pytest-cov
+requests
