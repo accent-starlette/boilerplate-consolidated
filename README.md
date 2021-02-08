@@ -90,6 +90,7 @@ save you copying each line.
 
 ```python
 import asyncio
+from app.db import db
 from app.utils.testing import create_user
 asyncio.run(create_user('admin@example.com', 'password', 'Admin', 'User'))
 ```
