@@ -19,7 +19,7 @@ from app.utils.testing import create_user  # noqa isort:skip
 def database_exists():
     url = copy(DATABASE_URL)
     db_name = url.database
-    url = url.replace(database="postgres")
+    url = url.set(database="postgres")
     engine = sa.create_engine(str(url))
 
     def get_scalar_result(engine, sql):
@@ -36,7 +36,7 @@ def database_exists():
 def create_database():
     url = copy(DATABASE_URL)
     db_name = url.database
-    url = url.replace(database="postgres")
+    url = url.set(database="postgres")
     engine = sa.create_engine(str(url))
     engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     text = """
@@ -52,7 +52,7 @@ def create_database():
 def drop_database():
     url = copy(DATABASE_URL)
     db_name = url.database
-    url = url.replace(database="postgres")
+    url = url.set(database="postgres")
     engine = sa.create_engine(str(url))
 
     connection = engine.connect()

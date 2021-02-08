@@ -1,13 +1,12 @@
+from sqlalchemy.engine import make_url
 from starlette.config import Config
 from starlette.datastructures import URL, CommaSeparatedStrings, Secret
-
-from app.utils.database import DatabaseURL
 
 config = Config()
 
 # base
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=CommaSeparatedStrings)
-DATABASE_URL = config("DATABASE_URL", cast=DatabaseURL)
+DATABASE_URL = config("DATABASE_URL", cast=make_url)
 DEBUG = config("DEBUG", cast=bool, default=False)
 SECRET_KEY = config("SECRET_KEY", cast=Secret)
 
@@ -36,4 +35,4 @@ SENTRY_DSN = config("SENTRY_DSN", cast=URL, default=None)
 
 # test
 if TESTING:
-    DATABASE_URL = DATABASE_URL.replace(database="test_" + DATABASE_URL.database)
+    DATABASE_URL = DATABASE_URL.set(database="test_" + DATABASE_URL.database)

@@ -1,6 +1,3 @@
-import typing
-from urllib.parse import SplitResult, parse_qsl, urlsplit
-
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
@@ -75,7 +72,7 @@ class Database:
     engine: AsyncEngine = None
     session: AsyncSession = None
 
-    def __init__(self, url: "DatabaseURL", engine_kwargs: dict = {}) -> None:
+    def __init__(self, url: str, engine_kwargs: dict = {}) -> None:
         # configure the engine
         self.engine = create_async_engine(str(url), **engine_kwargs)
         self.session = AsyncSession(bind=self.engine)
@@ -103,108 +100,3 @@ class Database:
                 except:
                     pass
             await trans.commit()
-
-
-class _EmptyNetloc(str):
-    def __bool__(self) -> bool:
-        return True
-
-
-class DatabaseURL:
-    def __init__(self, url: typing.Union[str, "DatabaseURL"]):
-        self._url = str(url)
-
-    @property
-    def components(self) -> SplitResult:
-        if not hasattr(self, "_components"):
-            self._components = urlsplit(self._url)
-        return self._components
-
-    @property
-    def dialect(self) -> str:
-        return self.components.scheme.split("+")[0]
-
-    @property
-    def driver(self) -> str:
-        if "+" not in self.components.scheme:
-            return ""
-        return self.components.scheme.split("+", 1)[1]
-
-    @property
-    def username(self) -> typing.Optional[str]:
-        return self.components.username
-
-    @property
-    def password(self) -> typing.Optional[str]:
-        return self.components.password
-
-    @property
-    def hostname(self) -> typing.Optional[str]:
-        return self.components.hostname
-
-    @property
-    def port(self) -> typing.Optional[int]:
-        return self.components.port
-
-    @property
-    def netloc(self) -> typing.Optional[str]:
-        return self.components.netloc
-
-    @property
-    def database(self) -> str:
-        return self.components.path.lstrip("/")
-
-    @property
-    def options(self) -> dict:
-        if not hasattr(self, "_options"):
-            self._options = dict(parse_qsl(self.components.query))
-        return self._options
-
-    def replace(self, **kwargs: typing.Any) -> "DatabaseURL":
-        if (
-            "username" in kwargs
-            or "password" in kwargs
-            or "hostname" in kwargs
-            or "port" in kwargs
-        ):
-            hostname = kwargs.pop("hostname", self.hostname)
-            port = kwargs.pop("port", self.port)
-            username = kwargs.pop("username", self.username)
-            password = kwargs.pop("password", self.password)
-
-            netloc = hostname
-            if port is not None:
-                netloc += f":{port}"
-            if username is not None:
-                userpass = username
-                if password is not None:
-                    userpass += f":{password}"
-                netloc = f"{userpass}@{netloc}"
-
-            kwargs["netloc"] = netloc
-
-        if "database" in kwargs:
-            kwargs["path"] = "/" + kwargs.pop("database")
-
-        if "dialect" in kwargs or "driver" in kwargs:
-            dialect = kwargs.pop("dialect", self.dialect)
-            driver = kwargs.pop("driver", self.driver)
-            kwargs["scheme"] = f"{dialect}+{driver}" if driver else dialect
-
-        if not kwargs.get("netloc", self.netloc):
-            kwargs["netloc"] = _EmptyNetloc()
-
-        components = self.components._replace(**kwargs)
-        return self.__class__(components.geturl())
-
-    def __str__(self) -> str:
-        return self._url
-
-    def __repr__(self) -> str:
-        url = str(self)
-        if self.password:
-            url = str(self.replace(password="********"))
-        return f"{self.__class__.__name__}({repr(url)})"
-
-    def __eq__(self, other: typing.Any) -> bool:
-        return str(self) == str(other)
