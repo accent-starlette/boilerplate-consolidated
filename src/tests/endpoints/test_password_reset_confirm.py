@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from app.auth.tables import User
 from app.auth.tokens import token_generator
 from app.main import app
 from app.utils.base64 import urlsafe_base64_encode
@@ -88,7 +89,7 @@ async def test_post_changed_password(client, user):
         url, data={"new_password": "foobar25", "confirm_new_password": "foobar25"}
     )
 
-    await user.refresh_from_db()
+    user = await User.get(user.id)
     assert user.check_password("foobar25")
 
 

@@ -22,7 +22,7 @@ class PasswordResetForm(form.Form):
 
     async def send_email(self, request: Request):
         qs = sa.select(User).where(User.email == self.data["email"])
-        result = await User.session.execute(qs)
+        result = await User.execute(qs)
         user = result.scalars().first()
         if not user:
             return

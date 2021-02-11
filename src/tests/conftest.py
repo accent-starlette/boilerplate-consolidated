@@ -10,6 +10,8 @@ from starlette.config import environ
 
 environ["TESTING"] = "TRUE"
 
+from app.auth.tables import User
+
 from app.db import db  # noqa isort:skip
 from app.main import app  # noqa isort:skip
 from app.settings import DATABASE_URL  # noqa isort:skip
@@ -102,7 +104,15 @@ async def client() -> AsyncIterator[AsyncClient]:
 
 @pytest.fixture()
 async def user():
-    return await create_user("test@example.com", "pass", "Test", "User")
+    user = await create_user("test@example.com", "pass", "Test", "User")
+    # refetch the user with scopes
+    qs = (
+        sa.select(User)
+        .where(User.id == user.id)
+        .options(sa.orm.selectinload(User.scopes))
+    )
+    result = await User.execute(qs)
+    return result.scalar()
 
 
 @pytest.fixture()

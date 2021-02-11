@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationBackend,
@@ -13,7 +14,13 @@ class AuthBackend(AuthenticationBackend):
         user_id = conn.session.get("user")
         if user_id:
             try:
-                return await User.get(user_id)
+                qs = (
+                    sa.select(User)
+                    .where(User.id == user_id)
+                    .options(sa.orm.selectinload(User.scopes))
+                )
+                result = await User.execute(qs)
+                return result.scalars().first()
             except:
                 conn.session.pop("user")
 

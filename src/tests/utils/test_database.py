@@ -36,8 +36,8 @@ async def test_declarative_base__save(database):
     await user.save()
 
     qs = sa.select(SomeModel).where(SomeModel.name == "ted")
-    result = await SomeModel.session.execute(qs)
-    assert result.scalars().first() == user
+    result = await SomeModel.execute(qs)
+    assert result.scalars().first().id == user.id
 
 
 @pytest.mark.asyncio
@@ -50,20 +50,8 @@ async def test_declarative_base__delete(database):
     await user.delete()
 
     qs = sa.select(SomeModel).where(SomeModel.name == "ted")
-    result = await SomeModel.session.execute(qs)
+    result = await SomeModel.execute(qs)
     assert result.scalars().first() is None
-
-
-@pytest.mark.asyncio
-async def test_declarative_base__refresh_from_db(database):
-    await database.create_all()
-
-    user = SomeModel(name="ted")
-    await user.save()
-    user.name = "sam"
-
-    await user.refresh_from_db()
-    assert user.name == "ted"
 
 
 @pytest.mark.asyncio
@@ -85,7 +73,7 @@ async def test_declarative_base__get(database):
     await user.save()
 
     # get
-    assert await SomeModel.get(user.id) == user
+    assert (await SomeModel.get(user.id)).id == user.id
 
     # get is none
     assert await SomeModel.get(1000) is None
@@ -99,7 +87,7 @@ async def test_declarative_base__get_or_404(database):
     await user.save()
 
     # get_or_404
-    assert await SomeModel.get_or_404(user.id) == user
+    assert await SomeModel.get_or_404(user.id)
 
     # get_or_404 raises http exception when no result found
     with pytest.raises(HTTPException) as e:

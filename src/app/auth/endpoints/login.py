@@ -31,7 +31,7 @@ class Login(HTTPEndpoint):
 
         try:
             qs = sa.select(User).where(User.email == form.email.data.lower())
-            result = await User.session.execute(qs)
+            result = await User.execute(qs)
             user = result.scalars().one()
             if user.check_password(form.password.data):
                 request.session["user"] = str(user.id)

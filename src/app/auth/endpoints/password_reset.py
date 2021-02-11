@@ -31,7 +31,7 @@ class PasswordReset(HTTPEndpoint):
             return templates.TemplateResponse(template, context)
 
         qs = sa.select(User).where(User.email == form.email.data.lower())
-        result = await User.session.execute(qs)
+        result = await User.execute(qs)
         user = result.scalars().first()
         if user and user.is_active:
             await form.send_email(request)

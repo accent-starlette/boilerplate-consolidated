@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
+from sqlalchemy.orm import sessionmaker
 from starlette.exceptions import HTTPException
 
 metadata = sa.MetaData()
@@ -11,16 +12,22 @@ metadata = sa.MetaData()
 @as_declarative(metadata=metadata)
 class ModelBase:
     metadata: sa.MetaData = metadata
-    session: AsyncSession = None
+    session: sessionmaker = None
 
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
 
     @classmethod
+    async def execute(cls, qs):
+        async with cls.session() as session:
+            async with session.begin():
+                return await session.execute(qs)
+
+    @classmethod
     async def get(cls, ident):
         qs = sa.select(cls).where(cls.id == ident)
-        results = await cls.session.execute(qs)
+        results = await cls.execute(qs)
         return results.scalars().first()
 
     @classmethod
@@ -41,43 +48,46 @@ class ModelBase:
     async def save(self) -> None:
         """ save the current instance """
 
-        async with self.session.begin_nested():
-            self.session.add(self)
+        async with self.session() as session:
+            async with session.begin_nested():
+                session.add(self)
 
-        try:
-            await self.session.commit()
-        except Exception as e:
-            await self.session.rollback()
-            raise e
+            try:
+                await session.commit()
+            except Exception as e:
+                await session.rollback()
+                raise e
 
     async def delete(self) -> None:
         """ delete the current instance """
 
-        async with self.session.begin_nested():
-            self.session.delete(self)
+        async with self.session() as session:
+            async with session.begin_nested():
+                session.delete(self)
 
-        try:
-            await self.session.commit()
-        except Exception as e:
-            await self.session.rollback()
-            raise e
-
-    async def refresh_from_db(self) -> None:
-        """ Refresh the current instance from the database """
-
-        await self.session.refresh(self)
+            try:
+                await session.commit()
+            except Exception as e:
+                await session.rollback()
+                raise e
 
 
 class Database:
     engine: AsyncEngine = None
-    session: AsyncSession = None
 
     def __init__(self, url: str, engine_kwargs: dict = {}) -> None:
         # configure the engine
         self.engine = create_async_engine(str(url), **engine_kwargs)
-        self.session = AsyncSession(bind=self.engine)
         # configue base attrs
-        ModelBase.session = self.session
+        ModelBase.session = self.get_sessionmaker
+
+    @property
+    def get_sessionmaker(self) -> sessionmaker:
+        return sessionmaker(
+            self.engine,
+            expire_on_commit=False,
+            class_=AsyncSession,
+        )
 
     async def create_all(self) -> None:
         # create all tables
@@ -85,8 +95,6 @@ class Database:
             await conn.run_sync(metadata.create_all)
 
     async def drop_all(self) -> None:
-        # close the open session
-        await self.session.close()
         # drop all tables
         async with self.engine.begin() as conn:
             await conn.run_sync(metadata.drop_all)

@@ -1,5 +1,6 @@
 import pytest
 
+from app.auth.tables import User
 from app.main import app
 
 
@@ -24,7 +25,7 @@ async def test_user_last_login_set(client, user):
     assert user.last_login is None
     url = app.url_path_for("auth:login")
     await client.post(url, data={"email": user.email, "password": "pass"})
-    await user.refresh_from_db()
+    user = await User.get(user.id)
     assert user.last_login is not None
 
 
