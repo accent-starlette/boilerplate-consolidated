@@ -23,13 +23,7 @@ EMAIL_PASSWORD = config("EMAIL_PASSWORD", cast=Secret, default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=False)
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=30)
 
-# aws
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default=None)
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", cast=Secret, default=None)
-AWS_BUCKET = config("AWS_BUCKET", default=None)
-AWS_REGION = config("AWS_REGION", default=None)
-
-# env
+# debugging
 TESTING = config("TESTING", cast=bool, default=False)
 SENTRY_DSN = config("SENTRY_DSN", cast=URL, default=None)
 

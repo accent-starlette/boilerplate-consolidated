@@ -54,12 +54,6 @@ The container is ready at http://localhost
 - EMAIL_USERNAME
 - EMAIL_PASSWORD
 
-### aws
-- AWS_ACCESS_KEY_ID
-- AWS_SECRET_ACCESS_KEY
-- AWS_BUCKET
-- AWS_REGION
-
 ### other
 - SENTRY_DSN
 
