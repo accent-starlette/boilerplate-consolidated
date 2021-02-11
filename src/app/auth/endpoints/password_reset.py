@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from starlette import status
 from starlette.authentication import requires
+from starlette.background import BackgroundTask
 from starlette.endpoints import HTTPEndpoint
 from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
@@ -33,12 +34,15 @@ class PasswordReset(HTTPEndpoint):
         qs = sa.select(User).where(User.email == form.email.data.lower())
         result = await User.execute(qs)
         user = result.scalars().first()
+
+        background = None
         if user and user.is_active:
-            await form.send_email(request)
+            background = BackgroundTask(form.send_email, request=request)
 
         return RedirectResponse(
             request.url_for("auth:password_reset_done"),
             status_code=status.HTTP_302_FOUND,
+            background=background,
         )
 
 
