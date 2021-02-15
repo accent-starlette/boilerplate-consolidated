@@ -8,7 +8,7 @@ jinja2
 psycopg2-binary
 python-multipart
 sentry-asgi
-sqlalchemy==1.4.0b1
+sqlalchemy==1.4.0b2
 starlette
 typing
 uvicorn[standard]
