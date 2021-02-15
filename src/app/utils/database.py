@@ -12,7 +12,7 @@ metadata = sa.MetaData()
 @as_declarative(metadata=metadata)
 class ModelBase:
     metadata: sa.MetaData = metadata
-    session: sessionmaker = None
+    db: "Database"
 
     @declared_attr
     def __tablename__(cls):
@@ -20,7 +20,7 @@ class ModelBase:
 
     @classmethod
     async def execute(cls, qs):
-        async with cls.session() as session:
+        async with cls.db.session() as session:
             async with session.begin():
                 return await session.execute(qs)
 
@@ -48,7 +48,7 @@ class ModelBase:
     async def save(self) -> None:
         """ save the current instance """
 
-        async with self.session() as session:
+        async with self.db.session() as session:
             async with session.begin_nested():
                 session.add(self)
 
@@ -61,7 +61,7 @@ class ModelBase:
     async def delete(self) -> None:
         """ delete the current instance """
 
-        async with self.session() as session:
+        async with self.db.session() as session:
             async with session.begin_nested():
                 session.delete(self)
 
@@ -73,16 +73,16 @@ class ModelBase:
 
 
 class Database:
-    engine: AsyncEngine = None
+    engine: AsyncEngine
 
     def __init__(self, url: str, engine_kwargs: dict = {}) -> None:
         # configure the engine
         self.engine = create_async_engine(str(url), **engine_kwargs)
         # configue base attrs
-        ModelBase.session = self.get_sessionmaker
+        ModelBase.db = self
 
     @property
-    def get_sessionmaker(self) -> sessionmaker:
+    def session(self) -> sessionmaker:
         return sessionmaker(
             self.engine,
             expire_on_commit=False,
