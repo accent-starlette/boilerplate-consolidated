@@ -16,7 +16,7 @@ class AuthBackend(AuthenticationBackend):
             try:
                 qs = (
                     sa.select(User)
-                    .where(User.id == user_id)
+                    .where(User.id == int(user_id))
                     .options(sa.orm.selectinload(User.scopes))
                 )
                 result = await User.execute(qs)

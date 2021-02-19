@@ -1,5 +1,6 @@
 from __future__ import with_statement
 
+from copy import copy
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -27,7 +28,9 @@ target_metadata = db.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option('sqlalchemy.url', str(settings.DATABASE_URL))
+url = copy(settings.DATABASE_URL)
+url = url.set(drivername="postgresql")
+config.set_main_option('sqlalchemy.url', str(url))
 
 
 def run_migrations_offline():

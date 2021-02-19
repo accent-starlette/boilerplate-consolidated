@@ -58,7 +58,7 @@ class PasswordResetConfirm(HTTPEndpoint):
     async def get_user(self, uidb64):
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
-            user = await User.get(uid)
+            user = await User.get(int(uid))
         except:
             user = None
         return user
