@@ -34,6 +34,6 @@ jobs:
       env:
         PYTHONUNBUFFERED: 1
         ALLOWED_HOSTS: "*"
-        DATABASE_URL: "postgresql://postgres:password@localhost:5432/appdb"
+        DATABASE_URL: "postgresql+asyncpg://postgres:password@localhost:5432/appdb"
         SECRET_KEY: 'some-secret-key'
       run: cd src && scripts/test

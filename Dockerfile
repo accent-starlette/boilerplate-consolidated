@@ -5,7 +5,7 @@ FROM        accent/starlette-docker:3.8-alpine
 
 ENV         APP_MODULE=app.main:app \
             ALLOWED_HOSTS="*" \
-            DATABASE_URL=postgresql+psycopg2://postgres:password@db:5432/appdb \
+            DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/appdb \
             SECRET_KEY="***** change me *****" \
             EMAIL_HOST=mail \
             EMAIL_PORT=1025 \

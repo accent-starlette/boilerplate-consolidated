@@ -6,10 +6,9 @@ email-validator
 gunicorn
 itsdangerous
 jinja2
-psycopg2-binary
 python-multipart
 sentry-asgi
-sqlalchemy==1.4.0b3
+sqlalchemy
 starlette
 typing
 uvicorn[standard]

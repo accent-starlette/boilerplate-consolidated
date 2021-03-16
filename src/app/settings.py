@@ -1,3 +1,5 @@
+import logging.config
+
 from sqlalchemy.engine import make_url
 from starlette.config import Config
 from starlette.datastructures import URL, CommaSeparatedStrings, Secret
@@ -26,6 +28,34 @@ EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=30)
 # debugging
 TESTING = config("TESTING", cast=bool, default=False)
 SENTRY_DSN = config("SENTRY_DSN", cast=URL, default=None)
+
+# logging
+LOG_LEVEL = config("LOG_LEVEL", default="WARNING")
+LOG_CONFIG = {
+    "version": 1,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+        # "file": {
+        #     "class": "logging.FileHandler",
+        #     "filename": "/debug.log",
+        # },
+    },
+    "loggers": {
+        "app": {
+            "level": LOG_LEVEL,
+            "handlers": ["console"],
+        },
+        # "sqlalchemy.engine": {
+        #     "level": LOG_LEVEL,
+        #     "handlers": ["file"],
+        #     "propagate": False,
+        # },
+    },
+}
+
+logging.config.dictConfig(LOG_CONFIG)
 
 # test
 if TESTING:

@@ -63,7 +63,7 @@ class ModelBase:
 
         async with self.db.session() as session:
             async with session.begin_nested():
-                session.delete(self)
+                await session.delete(self)
 
             try:
                 await session.commit()
