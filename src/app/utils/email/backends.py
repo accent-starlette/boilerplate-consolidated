@@ -59,7 +59,7 @@ class BaseEmailBackend:
 
 
 class ConsoleEmailBackend(BaseEmailBackend):
-    """ A wrapper that sends email to the console. """
+    """A wrapper that sends email to the console."""
 
     def __init__(self, fail_silently: bool = False, **kwargs: typing.Any) -> None:
         super().__init__(fail_silently=fail_silently)
@@ -78,7 +78,7 @@ class ConsoleEmailBackend(BaseEmailBackend):
         self.stream.write("\n")
 
     async def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
-        """ Write all messages to the stream in a thread-safe way. """
+        """Write all messages to the stream in a thread-safe way."""
 
         if not email_messages:
             return 0
@@ -98,7 +98,7 @@ class ConsoleEmailBackend(BaseEmailBackend):
 
 
 class SmtpEmailBackend(BaseEmailBackend):
-    """ A wrapper that manages the SMTP network connection. """
+    """A wrapper that manages the SMTP network connection."""
 
     host = settings.EMAIL_HOST
     port = settings.EMAIL_PORT

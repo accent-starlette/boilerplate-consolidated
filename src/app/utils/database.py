@@ -46,7 +46,7 @@ class ModelBase:
     id = sa.Column(sa.Integer, primary_key=True)
 
     async def save(self) -> None:
-        """ save the current instance """
+        """save the current instance"""
 
         async with self.db.session() as session:
             async with session.begin_nested():
@@ -59,7 +59,7 @@ class ModelBase:
                 raise e
 
     async def delete(self) -> None:
-        """ delete the current instance """
+        """delete the current instance"""
 
         async with self.db.session() as session:
             async with session.begin_nested():
