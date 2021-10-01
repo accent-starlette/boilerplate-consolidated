@@ -1,7 +1,7 @@
 ARG         EXTRA_BUILD_DEPS='g++'
 ARG         REQUIREMENTS_FILE=/requirements/base.txt
 
-FROM        accent/starlette-docker:3.8-alpine
+FROM        public.ecr.aws/g3c5k4i8/starlette-docker:3.8-alpine
 
 ENV         APP_MODULE=app.main:app \
             ALLOWED_HOSTS="*" \
