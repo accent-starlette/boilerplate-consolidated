@@ -3,7 +3,6 @@ from email.message import EmailMessage
 import sqlalchemy as sa
 from starlette.requests import Request
 from wtforms import fields, form, validators
-from wtforms.fields.html5 import EmailField
 
 from app.auth.tables import User
 from app.auth.tokens import token_generator
@@ -13,7 +12,7 @@ from app.utils.templating import templates
 
 
 class PasswordResetForm(form.Form):
-    email = EmailField(
+    email = fields.EmailField(
         validators=[
             validators.DataRequired(),
             validators.Email(message="Must be a valid email."),
