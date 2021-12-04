@@ -15,8 +15,9 @@ async def test_get(client):
 async def test_can_login(client, user):
     url = app.url_path_for("auth:login")
     response = await client.post(url, data={"email": user.email, "password": "pass"})
-    assert response.status_code == 200
-    assert response.url == "http://test/"
+    assert response.status_code == 302
+    assert response.is_redirect
+    assert response.next_request.url == "http://test/"
     assert "session" in response.cookies
 
 

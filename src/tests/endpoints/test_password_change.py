@@ -31,17 +31,22 @@ async def test_can_change_password(client, user, login):
             "confirm_new_password": "p@ss",
         },
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
+    assert response.next_request.url == "http://test/"
 
     # can then use new password
     url = app.url_path_for("auth:logout")
     response = await client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
+    assert response.next_request.url == "http://test/"
 
     url = app.url_path_for("auth:login")
     response = await client.post(url, data={"email": user.email, "password": "p@ss"})
-    assert response.status_code == 200
-    assert response.url == "http://test/"
+    assert response.status_code == 302
+    assert response.is_redirect
+    assert response.next_request.url == "http://test/"
 
 
 @pytest.mark.parametrize(

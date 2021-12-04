@@ -74,9 +74,10 @@ async def test_post(client, user):
     response = await client.post(
         url, data={"new_password": "password1", "confirm_new_password": "password1"}
     )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
     url = app.url_path_for("auth:password_reset_complete")
-    assert response.url == f"http://test{url}"
+    assert response.next_request.url == f"http://test{url}"
 
 
 @pytest.mark.asyncio

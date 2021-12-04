@@ -53,8 +53,9 @@ async def test_scoped_endpoints(user):
         url = copy_app.url_path_for("auth:login")
         login = await client.post(url, data={"email": user.email, "password": "pass"})
 
-        assert login.status_code == 200
-        assert login.url == "http://test/"
+        assert login.status_code == 302
+        assert login.is_redirect
+        assert login.next_request.url == "http://test/"
 
         assert (await client.get("/unauthed")).status_code == 403
         assert (await client.get("/authed")).status_code == 200

@@ -22,9 +22,10 @@ async def test_post_redirects(client, monkeypatch):
 
     url = app.url_path_for("auth:password_reset")
     response = await client.post(url, data={"email": "fake@example.com"})
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
     url = app.url_path_for("auth:password_reset_done")
-    assert response.url == f"http://test{url}"
+    assert response.next_request.url == f"http://test{url}"
 
 
 @pytest.mark.asyncio
@@ -39,9 +40,10 @@ async def test_email_not_sent_if_user_is_not_active(client, user, monkeypatch):
 
     url = app.url_path_for("auth:password_reset")
     response = await client.post(url, data={"email": user.email})
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
     url = app.url_path_for("auth:password_reset_done")
-    assert response.url == f"http://test{url}"
+    assert response.next_request.url == f"http://test{url}"
 
 
 @pytest.mark.asyncio
@@ -54,9 +56,10 @@ async def test_txt_email_sent_if_user_exists(client, user, monkeypatch):
 
     url = app.url_path_for("auth:password_reset")
     response = await client.post(url, data={"email": user.email})
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response.is_redirect
     url = app.url_path_for("auth:password_reset_done")
-    assert response.url == f"http://test{url}"
+    assert response.next_request.url == f"http://test{url}"
 
 
 @pytest.mark.parametrize(
